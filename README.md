@@ -33,7 +33,7 @@ unique.slugs:
 Your collection doesn't need a visible field named "slug", but you can't edit
 it if you don't have one.
 
-If you want to hide the slug field for non-admins, just add the folling code
+If you want to hide the slug field for non-admins, just add the following code
 to the read permissions of your collection:
 
 ```php
