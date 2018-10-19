@@ -19,9 +19,9 @@ all options:
 
 ```yaml
 # unique slugs
-unique.slugs:
-    all.collections : false # default: false
-    slug.name       : slug  # default: "slug"
+unique_slugs:
+    all_collections : false # default: false
+    slug_name       : slug  # default: "slug"
     delimiter       : |     # default: "|", is used for nested fields
     collections:
         pages     : title
@@ -52,3 +52,12 @@ instead of "ae"). If you want unique slugs, that option is not necessary anymore
 
 This code is a modified version of https://gist.github.com/fabianmu/5f73a6c2303e08add4e00dc2e548ef2d
 Thanks to https://github.com/fabianmu and https://github.com/aheinze
+
+## Changelog
+
+**2018-10-19**
+
+* added ability to use multiple fields for slug generation
+* added nested fields for slug generation
+* config name separators were changed from dots to underscores
+  * added check for backwards compatibility - will be removed in the future

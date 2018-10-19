@@ -1,21 +1,37 @@
 <?php
 
-$uniqueSlug = function($name, &$entry, $isUpdate) use ($app) {
+$config = $app['unique_slugs'] ?? null;
+
+// config name separators were changed from dots to underscores
+// this check is for backwards compatibility and
+// will be removed in a future version
+if (!$config && isset($app['unique.slugs'])) {
+    $config = $app['unique.slugs'] ?? null;
+    if (isset($config['all.collections']))
+        $config['all_collections'] = $app['unique_slugs']['all.collections'];
+    if (isset($config['slug.name']))
+        $config['slug_name'] = $app['unique_slugs']['slug.name'];
+}
+
+
+$uniqueSlug = function($name, &$entry, $isUpdate) use ($app, $config) {
+
+    if (!$config) return;
 
     // get slug name from config.yaml
-    $slugName = isset($app['unique.slugs']['slug.name']) ? $app['unique.slugs']['slug.name'] : 'slug';
+    $slugName = isset($config['slug_name']) ? $config['slug_name'] : 'slug';
 
     // create empty slug field if it doesn't exist
     if (!isset($entry[$slugName]))
         $entry[$slugName] = '';
 
     // get field name from config.yaml
-    if (isset($app['unique.slugs']['collections'][$name])) {
+    if (isset($config['collections'][$name])) {
 
-        $fld = $app['unique.slugs']['collections'][$name];
+        $fld = $config['collections'][$name];
         $fld = is_array($fld) ? $fld : [$fld];
 
-        $delim = $app['unique.slugs']['delimiter'] ?? '|';
+        $delim = $config['delimiter'] ?? '|';
 
         $slugString = null;
         foreach ($fld as $val) {
@@ -33,10 +49,14 @@ $uniqueSlug = function($name, &$entry, $isUpdate) use ($app) {
             $slugString = is_string($current) ? $current : $slugString;
             if ($slugString) break;
         }
+        if (!$slugString) $slugString = '';
     }
     else {
         
         // to do, use defaults like title/name/first entry/...
+        
+        // setting `all_collections : true` has no effect right now
+        
         return;
 
     }
@@ -44,15 +64,14 @@ $uniqueSlug = function($name, &$entry, $isUpdate) use ($app) {
     // generate slug on create only or when an existing one is empty
     if (!$isUpdate || ($isUpdate && trim($entry[$slugName]) == '')) {
 
-        // $slug = $app->helper('utils')->sluggify($entry[$fld] ?? '');
-        $slug = $app->helper('utils')->sluggify($slugString);
+        $slug = $app->helper('utils')->sluggify($slugString ?? '');
 
         // count entries with the same slug
-        $entries = $app->module('collections')->count($name, [$slugName => $slug]);
+        $count = $app->module('collections')->count($name, [$slugName => $slug]);
         
-        // if slug is existing already, postfix with incremental count
-        if ($entries > 0)
-            $slug = "{$slug}-{$entries}";
+        // if slug exists already, postfix with incremental count
+        if ($count > 0)
+            $slug = "{$slug}-{$count}";
         
         // save generated slug to field with name $slugName
         $entry[$slugName] = $slug;
@@ -61,12 +80,11 @@ $uniqueSlug = function($name, &$entry, $isUpdate) use ($app) {
 };
 
 // set event handler with uniqueSlug function
-if (isset($app['unique.slugs'])){
-    
-    if (isset($app['unique.slugs']['all.collections']) && $app['unique.slugs']['all.collections'])
+if ($config){
+    if (isset($config['all_collections']) && $config['all_collections'])
         $app->on("collections.save.before", $uniqueSlug);
     
-    elseif (isset($app['unique.slugs']['collections']))
-        foreach ($app['unique.slugs']['collections'] as $col => $field)
+    elseif (isset($config['collections']))
+        foreach ($config['collections'] as $col => $field)
             $app->on("collections.save.before.$col", $uniqueSlug);
 }
