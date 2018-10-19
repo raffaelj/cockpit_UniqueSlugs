@@ -4,7 +4,7 @@ Unique slugs for collections in Cockpit - https://github.com/agentejo/cockpit
 
 ## How to use
 
-Copy this folder into `cockpit/addons/`.
+Copy the folder `UniqueSlugs` into `cockpit/addons/UniqueSlugs`.
 
 Add these options to `cockpit/config/config.yaml` to specify the collections and field names for slug generation:
 
