@@ -9,7 +9,7 @@ Copy the folder `UniqueSlugs` into `cockpit/addons/UniqueSlugs`.
 Add these options to `cockpit/config/config.yaml` to specify the collections and field names for slug generation:
 
 ```yaml
-unique.slugs:
+unique_slugs:
     collections:
         pages     : title
         products  : name
