@@ -41,15 +41,19 @@ $uniqueSlug = function($name, &$entry, $isUpdate) use ($app, $config) {
                 if ($slugString) break;
             }
 
+            // loop to get nested fields for slug
             $current = $entry;
             foreach (explode($delim, $val) as $key) {
+                if (!isset($current[$key])){
+                    $current = null;
+                    break;
+                }
                 $current = &$current[$key];
             }
 
-            $slugString = is_string($current) ? $current : $slugString;
+            $slugString = is_string($current) && !empty($current) ? $current : $slugString;
             if ($slugString) break;
         }
-        if (!$slugString) $slugString = '';
     }
     else {
         
@@ -64,7 +68,7 @@ $uniqueSlug = function($name, &$entry, $isUpdate) use ($app, $config) {
     // generate slug on create only or when an existing one is empty
     if (!$isUpdate || ($isUpdate && trim($entry[$slugName]) == '')) {
 
-        $slug = $app->helper('utils')->sluggify($slugString ?? '');
+        $slug = $app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
 
         // count entries with the same slug
         $count = $app->module('collections')->count($name, [$slugName => $slug]);
