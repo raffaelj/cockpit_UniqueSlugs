@@ -34,15 +34,17 @@ unique_slugs:
 
 ## Notes:
 
-Your collection doesn't need a visible field named "slug", but you can't edit
-it if you don't have one.
+Don't set `slug_name: fieldname_slug` if you also set `{"slug": true}` in the `fieldname` options for some reason. It should work, but it fails on multilingual setups ([explanation](https://github.com/agentejo/cockpit/issues/906)).
+
+Your collection can have a visible field named "slug", if you want to edit it by hand.
 
 The builtin option to sluggify text fields via options `{"slug": true}` in the 
 backend uses Javascript and leads to different results ("ä" becomes "a" 
 instead of "ae"). If you want unique slugs, that option is not necessary anymore..
 
-This code is a modified version of https://gist.github.com/fabianmu/5f73a6c2303e08add4e00dc2e548ef2d
-Thanks to https://github.com/fabianmu and https://github.com/aheinze
+The code for this addon is inspired by a [gist from fabianmu](https://gist.github.com/fabianmu/5f73a6c2303e08add4e00dc2e548ef2d)
+
+Thanks to [fabianmu](https://github.com/fabianmu) and [aheinze](https://github.com/aheinze)
 
 ## Changelog
 
