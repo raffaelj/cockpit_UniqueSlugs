@@ -1,20 +1,94 @@
 <?php
 
-/*
- * This is a dummy bootstrap file to prevent a
- * `Fatal error: require(): Failed opening required ...`
- * when `\Lime\App` tries to load the module without an
- * existing `bootstrap.php`.
- *
- * Don't copy the whole repository into your addons folder.
- * You only need the one, that is named like this addon.
- *
- * Sorry for the confusion, but I like to keep some data
- * (e. g. .gitignore or a docs folder) in the root, that
- * aren't necessary in production use of the addon.
- *
- */
+$config = $app['unique_slugs'] ?? null;
 
-$app->on('app.layout.contentbefore', function(){
-    echo '<p class="uk-panel"><span class="uk-badge uk-badge-warning"><i class="uk-margin-small-right uk-icon-warning"></i>' . basename(__DIR__) . '</span> You copied the wrong addon folder. Have a look at the addon\'s readme file for instructions.</p>';
-});
+// config name separators were changed from dots to underscores
+// this check is for backwards compatibility and
+// will be removed in a future version
+if (!$config && isset($app['unique.slugs'])) {
+    $config = $app['unique.slugs'] ?? null;
+    if (isset($config['all.collections']))
+        $config['all_collections'] = $app['unique_slugs']['all.collections'];
+    if (isset($config['slug.name']))
+        $config['slug_name'] = $app['unique_slugs']['slug.name'];
+}
+
+
+$uniqueSlug = function($name, &$entry, $isUpdate) use ($app, $config) {
+
+    if (!$config) return;
+
+    // get slug name from config.yaml
+    $slugName = isset($config['slug_name']) ? $config['slug_name'] : 'slug';
+
+    // create empty slug field if it doesn't exist
+    if (!isset($entry[$slugName]))
+        $entry[$slugName] = '';
+
+    // get field name from config.yaml
+    if (isset($config['collections'][$name])) {
+
+        $fld = $config['collections'][$name];
+        $fld = is_array($fld) ? $fld : [$fld];
+
+        $delim = $config['delimiter'] ?? '|';
+
+        $slugString = null;
+        foreach ($fld as $val) {
+
+            if (is_string($val) && strpos($val, $delim) === false) {
+                $slugString = $entry[$val] ?? null;
+                if ($slugString) break;
+            }
+
+            // loop to get nested fields for slug
+            $current = $entry;
+            foreach (explode($delim, $val) as $key) {
+                if (!isset($current[$key])){
+                    $current = null;
+                    break;
+                }
+                $current = &$current[$key];
+            }
+
+            $slugString = is_string($current) && !empty($current) ? $current : $slugString;
+            if ($slugString) break;
+        }
+    }
+    else {
+        
+        // to do, use defaults like title/name/first entry/...
+        
+        // setting `all_collections : true` has no effect right now
+        
+        return;
+
+    }
+
+    // generate slug on create only or when an existing one is empty
+    if (!$isUpdate || ($isUpdate && trim($entry[$slugName]) == '')) {
+
+        $slug = $app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
+
+        // count entries with the same slug
+        $count = $app->module('collections')->count($name, [$slugName => $slug]);
+        
+        // if slug exists already, postfix with incremental count
+        if ($count > 0)
+            $slug = "{$slug}-{$count}";
+        
+        // save generated slug to field with name $slugName
+        $entry[$slugName] = $slug;
+    }
+
+};
+
+// set event handler with uniqueSlug function
+if ($config){
+    if (isset($config['all_collections']) && $config['all_collections'])
+        $app->on("collections.save.before", $uniqueSlug);
+    
+    elseif (isset($config['collections']))
+        foreach ($config['collections'] as $col => $field)
+            $app->on("collections.save.before.$col", $uniqueSlug);
+}
