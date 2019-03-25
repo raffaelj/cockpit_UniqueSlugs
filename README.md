@@ -1,10 +1,17 @@
 # UniqueSlugs
 
-Unique slugs for collections in Cockpit - https://github.com/agentejo/cockpit
+Unique slugs for collections in [Cockpit CMS](https://github.com/agentejo/cockpit)
+
+## Installation
+
+Copy this repository into `/addons` and name it `UniqueSlugs` or
+
+```bash
+cd path/to/cockpit
+git clone https://github.com/raffaelj/cockpit_UniqueSlugs.git addons/UniqueSlugs
+```
 
 ## How to use
-
-Copy the folder `UniqueSlugs` into `cockpit/addons/UniqueSlugs`.
 
 Add these options to `cockpit/config/config.yaml` to specify the collections and field names for slug generation:
 
