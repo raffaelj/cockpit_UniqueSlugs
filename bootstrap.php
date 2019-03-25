@@ -1,4 +1,14 @@
 <?php
+/**
+ * unique slugs for Cockpit CMS
+ * 
+ * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
+ * @see       https://github.com/agentejo/cockpit/
+ * 
+ * @version   0.2.1
+ * @author    Raffael Jesche
+ * @license   MIT
+ */
 
 $config = $app['unique_slugs'] ?? null;
 
