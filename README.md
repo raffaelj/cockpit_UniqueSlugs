@@ -27,13 +27,20 @@ all options:
 ```yaml
 # unique slugs
 unique_slugs:
-    slug_name     : slug  # default: "slug"
-    placeholder   : page  # default: "entry"
-    delimiter     : |     # default: "|", is used for nested fields
+    slug_name     : slug        # default: "slug"
+    placeholder   : page        # default: "entry"
+    delimiter     : |           # default: "|", is used for nested fields
     collections   :
         pages     : title
         products  : name
-        something :       # use multiple fields as fallbacks
+        something :             # use multiple fields as fallbacks
+            - title
+            - name
+            - image|meta|title  # use nested fields for slugs
+    localize      :             # for localized fields, omitted if not set
+        pages     : title       # same name lime default language
+        products  : name
+        something :             # use multiple fields as fallbacks
             - title
             - name
             - image|meta|title  # use nested fields for slugs
@@ -54,6 +61,10 @@ The code for this addon is inspired by a [gist from fabianmu](https://gist.githu
 Thanks to [fabianmu](https://github.com/fabianmu) and [aheinze](https://github.com/aheinze)
 
 ## Changelog
+
+**2019-04-23**
+
+* added support for localized fields
 
 **2018-10-25**
 
