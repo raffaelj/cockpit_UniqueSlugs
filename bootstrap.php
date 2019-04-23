@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.4.0
+ * @version   0.4.1
  * @author    Raffael Jesche
  * @license   MIT
  */
@@ -144,31 +144,33 @@ $this->module('uniqueslugs')->extend([
         // slug doesn't exist yet
         if (!$count) return $slug;
 
-        // try again with a single iteration to keep the app fast
+        // try again with a single iteration
         $count = $this->app->module('collections')->count($name, [$slugName => $slug.'-1']);
 
         if (!$count) return $slug.'-1';
 
         // more than 1 duplicate - use a regex
-        // might slow down the app if there are a lot of duplicates
+        // at least one slug exists, that ends with "-{digit}", so explode needs no extra check
         // a simple count doesn't work, because entries could be deleted
         $options = [
-            'filter' => [
-                'slug' => ['$regex' => '/^'.$slug.'(-\d+|$)$/']
+            'filter' => [           // find "title" and "title-1", but not "title-test-1" or "title-2-1"
+                $slugName => ['$regex' => '/^'.$slug.'(-\d+|$)$/'],
             ],
-            'fields' =>  [
-                'slug' => true,
-                '_id' => false
+            'fields' =>  [          // no need for other fields
+                $slugName => true,
+                '_id' => false,
             ],
+            'sort' => [             // sort alphabetically descending
+                $slugName => -1,
+            ],
+            'limit' => 1,   // grab the last entry only
         ];
 
-        $slugs = array_flip(array_column($this->app->module('collections')->find($name, $options), $slugName));
+        $highest_slug = explode('-', $this->app->module('collections')->find($name, $options)[0][$slugName]);
 
-        for ($i = 1; ; $i++) {
+        $count = (int) end($highest_slug);
 
-            if (!isset($slugs[$slug.'-'.$i])) return $slug.'-'.$i;
-
-        }
+        return $slug . '-' . ($count + 1);
 
     },
 
