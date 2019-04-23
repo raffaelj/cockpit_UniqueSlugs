@@ -38,7 +38,7 @@ unique_slugs:
             - name
             - image|meta|title  # use nested fields for slugs
     localize      :             # for localized fields, omitted if not set
-        pages     : title       # field name without postfix ("_de")
+        pages     : title       # field name without suffix ("_de")
         products  : name
         something :             # use multiple fields as fallbacks
             - title
