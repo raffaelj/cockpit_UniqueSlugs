@@ -54,13 +54,13 @@ $this->module('uniqueslugs')->extend([
         // get field name
         if (isset($config['collections'][$name])) {
 
-            $fld = $config['collections'][$name];
-            $fld = is_array($fld) ? $fld : [$fld];
-
-            $slugString = $this->findSlugString($entry, $fld, $delim);
-
             // generate slug on create only or when an existing one is empty
             if (!$isUpdate || ($isUpdate && empty($entry[$slugName]))) {
+
+                $fld = $config['collections'][$name];
+                $fld = is_array($fld) ? $fld : [$fld];
+
+                $slugString = $this->findSlugString($entry, $fld, $delim);
 
                 $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
 
@@ -80,12 +80,12 @@ $this->module('uniqueslugs')->extend([
 
             foreach ($locales as $locale) {
 
-                $fld = $config['localize'][$name];
-                $fld = is_array($fld) ? $fld : [$fld];
-
-                $slugString = $this->findSlugString($entry, $fld, $delim, '_'.$locale);
-
                 if (!$isUpdate || ($isUpdate && empty($entry[$slugName.'_'.$locale]))) {
+
+                    $fld = $config['localize'][$name];
+                    $fld = is_array($fld) ? $fld : [$fld];
+
+                    $slugString = $this->findSlugString($entry, $fld, $delim, '_'.$locale);
 
                     $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
 
