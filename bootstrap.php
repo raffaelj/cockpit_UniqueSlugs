@@ -104,13 +104,13 @@ $this->module('uniqueslugs')->extend([
 
     },
 
-    'findSlugString' => function($entry, $fld, $delim, $postfix = '') {
+    'findSlugString' => function($entry, $fld, $delim, $suffix = '') {
 
         $slugString = null;
         foreach ($fld as $val) {
 
             if (strpos($val, $delim) === false) {
-                $slugString = !empty($entry[$val.$postfix]) ? $entry[$val.$postfix] : null;
+                $slugString = !empty($entry[$val.$suffix]) ? $entry[$val.$suffix] : null;
                 if ($slugString) break;
                 continue;
             }
@@ -119,11 +119,11 @@ $this->module('uniqueslugs')->extend([
             $current = $entry;
             $i = 0;
             foreach (explode($delim, $val) as $key) {
-                if (!isset($current[$i == 0 ? $key.$postfix : $key])){
+                if (!isset($current[$i == 0 ? $key.$suffix : $key])){
                     $current = null;
                     break;
                 }
-                $current = &$current[$i == 0 ? $key.$postfix : $key];
+                $current = &$current[$i == 0 ? $key.$suffix : $key];
                 $i++;
             }
 
@@ -149,25 +149,23 @@ $this->module('uniqueslugs')->extend([
         if (!$count) return $slug.'-1';
 
         // more than 1 duplicate - use a regex
-        // at least one slug exists, that ends with "-{digit}", so explode/find... below needs no extra check
         // a simple count doesn't work, because entries could be deleted
         $options = [
-            'filter' => [           // find "title" and "title-1", but not "title-test-1" or "title-2-1"
+            'filter' => [ // find "title" and "title-1", but not "title-test-1" or "title-2-1"
                 $slugName => ['$regex' => '/^'.$slug.'(-\d+|$)$/'],
             ],
-            'fields' =>  [          // no need for other fields
+            'fields' =>  [
                 $slugName => true,
                 '_id' => false,
             ],
-            'sort' => [             // sort alphabetically descending
-                $slugName => -1,
-            ],
-            'limit' => 1,           // grab the last entry only
         ];
 
-        $highest_slug = explode('-', $this->app->module('collections')->find($name, $options)[0][$slugName]);
+        $slugs = array_column($this->app->module('collections')->find($name, $options), $slugName);
 
-        $count = (int) end($highest_slug);
+        natsort($slugs); // sort natural
+
+        $highest = end($slugs);
+        $count = substr($highest, strrpos($highest, '-') + 1);
 
         return $slug . '-' . ($count + 1);
 
