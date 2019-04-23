@@ -10,7 +10,6 @@
  * @license   MIT
  */
 
-
 $this->module('uniqueslugs')->extend([
 
     'config' => function() {
@@ -150,7 +149,7 @@ $this->module('uniqueslugs')->extend([
         if (!$count) return $slug.'-1';
 
         // more than 1 duplicate - use a regex
-        // at least one slug exists, that ends with "-{digit}", so explode needs no extra check
+        // at least one slug exists, that ends with "-{digit}", so explode/find... below needs no extra check
         // a simple count doesn't work, because entries could be deleted
         $options = [
             'filter' => [           // find "title" and "title-1", but not "title-test-1" or "title-2-1"
@@ -163,7 +162,7 @@ $this->module('uniqueslugs')->extend([
             'sort' => [             // sort alphabetically descending
                 $slugName => -1,
             ],
-            'limit' => 1,   // grab the last entry only
+            'limit' => 1,           // grab the last entry only
         ];
 
         $highest_slug = explode('-', $this->app->module('collections')->find($name, $options)[0][$slugName]);

@@ -65,12 +65,8 @@ Thanks to [fabianmu][5] and [aheinze][6]
 **2019-04-23**
 
 * rewrite to object oriented style
-* improved localization
-* incremental count didn't work correctly in the past - fixed
-
-**2019-04-23**
-
 * added support for localized fields
+* incremental count didn't work correctly in the past - fixed
 
 **2018-10-25**
 
