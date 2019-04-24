@@ -63,11 +63,12 @@ Thanks to [fabianmu][5] and [aheinze][6]
 
 ## Changelog
 
-**2019-04-23**
+**0.4.2**
 
 * rewrite to object oriented style
 * added support for localized fields
 * incremental count didn't work correctly in the past - fixed
+* added optional unique check on each update, e. g. if user changes slug by hand, enable it with `check_on_update: true`
 
 **2018-10-25**
 
