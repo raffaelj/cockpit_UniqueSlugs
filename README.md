@@ -27,23 +27,24 @@ all options:
 ```yaml
 # unique slugs
 unique_slugs:
-    slug_name     : slug        # default: "slug"
-    placeholder   : page        # default: "entry"
-    delimiter     : |           # default: "|", is used for nested fields
-    collections   :
-        pages     : title
-        products  : name
-        something :             # use multiple fields as fallbacks
+    slug_name      : slug        # default: "slug"
+    placeholder    : page        # default: "entry"
+    check_on_update: true        # default: false, unique checks on each update (if user changes slug by hand)
+    delimiter      : |           # default: "|", is used for nested fields
+    collections    :
+        pages      : title
+        products   : name
+        something  :             # use multiple fields as fallbacks
             - title
             - name
-            - image|meta|title  # use nested fields for slugs
-    localize      :             # for localized fields, omitted if not set
-        pages     : title       # field name without suffix ("_de")
-        products  : name
-        something :             # use multiple fields as fallbacks
+            - image|meta|title   # use nested fields for slugs
+    localize       :             # for localized fields, omitted if not set
+        pages      : title       # field name without suffix ("_de")
+        products   : name
+        something  :             # use multiple fields as fallbacks
             - title
             - name
-            - image|meta|title  # use nested fields for slugs
+            - image|meta|title   # use nested fields for slugs
 ```
 
 ## Notes:

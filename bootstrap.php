@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.4.1
+ * @version   0.4.2
  * @author    Raffael Jesche
  * @license   MIT
  */
@@ -71,6 +71,22 @@ $this->module('uniqueslugs')->extend([
 
             }
 
+            elseif (!empty($config['check_on_update']) && $isUpdate && !empty($entry[$slugName])) {
+
+                // never trust user input ;-)
+                $slug = $this->app->helper('utils')->sluggify($entry[$slugName]);
+
+                if ($this->slugExists($name, $slug, $slugName)
+                    && !$this->isOwnSlug($name, $slug, $slugName, $entry['_id'])) {
+
+                    $slug = $this->incrementSlug($name, $slug, $slugName);
+
+                }
+
+                $entry[$slugName] = $slug;
+
+            }
+
         }
 
         if (isset($config['localize'][$name])) {
@@ -92,6 +108,22 @@ $this->module('uniqueslugs')->extend([
                     $slug = $this->incrementSlug($name, $slug, $slugName.'_'.$locale);
 
                     // save generated slug to "slug_de"
+                    $entry[$slugName.'_'.$locale] = $slug;
+
+                }
+
+                elseif (!empty($config['check_on_update']) && $isUpdate && !empty($entry[$slugName.'_'.$locale])) {
+
+                    // never trust user input ;-)
+                    $slug = $this->app->helper('utils')->sluggify($entry[$slugName.'_'.$locale]);
+
+                    if ($this->slugExists($name, $slug, $slugName.'_'.$locale)
+                        && !$this->isOwnSlug($name, $slug, $slugName.'_'.$locale, $entry['_id'])) {
+
+                        $slug = $this->incrementSlug($name, $slug, $slugName.'_'.$locale);
+
+                    }
+
                     $entry[$slugName.'_'.$locale] = $slug;
 
                 }
@@ -138,13 +170,13 @@ $this->module('uniqueslugs')->extend([
     'incrementSlug' => function($name, $slug, $slugName) {
 
         // fast single check, should always return 1 or 0
-        $count = $this->app->module('collections')->count($name, [$slugName => $slug]);
+        $count = $this->slugExists($name, $slug, $slugName);
 
         // slug doesn't exist yet
         if (!$count) return $slug;
 
         // try again with a single iteration
-        $count = $this->app->module('collections')->count($name, [$slugName => $slug.'-1']);
+        $count = $this->slugExists($name, $slug.'-1', $slugName);
 
         if (!$count) return $slug.'-1';
 
@@ -168,6 +200,33 @@ $this->module('uniqueslugs')->extend([
         $count = substr($highest, strrpos($highest, '-') + 1);
 
         return $slug . '-' . ($count + 1);
+
+    },
+
+    'slugExists' => function($name, $slug, $slugName) {
+
+        // fast single check, should always return 1 or 0
+        return $this->app->module('collections')->count($name, [$slugName => $slug]);
+
+    },
+
+    'isOwnSlug' => function($name, $slug, $slugName, $id) {
+
+        $filter = [
+            $slugName => $slug,
+            '_id' => $id,
+        ];
+        $projection = [
+            '_id' => true,
+        ];
+
+        $_id = $this->app->module('collections')->findOne($name, $filter, $projection);
+
+        if (isset($_id['_id']) && $_id['_id'] == $id) {
+            return true;
+        }
+
+        return false;
 
     },
 
