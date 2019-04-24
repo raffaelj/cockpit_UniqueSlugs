@@ -5,100 +5,246 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.2.1
+ * @version   0.4.2
  * @author    Raffael Jesche
  * @license   MIT
  */
 
-$config = $app['unique_slugs'] ?? null;
+$this->module('uniqueslugs')->extend([
 
-// config name separators were changed from dots to underscores
-// this check is for backwards compatibility and
-// will be removed in a future version
-if (!$config && isset($app['unique.slugs'])) {
-    $config = $app['unique.slugs'] ?? null;
-    if (isset($config['all.collections']))
-        $config['all_collections'] = $app['unique_slugs']['all.collections'];
-    if (isset($config['slug.name']))
-        $config['slug_name'] = $app['unique_slugs']['slug.name'];
-}
+    'config' => function() {
 
+        static $config;
 
-$uniqueSlug = function($name, &$entry, $isUpdate) use ($app, $config) {
+        if (!isset($config)) {
 
-    if (!$config) return;
+            $config = $this->app->retrieve('unique_slugs', null);
 
-    // get slug name from config.yaml
-    $slugName = isset($config['slug_name']) ? $config['slug_name'] : 'slug';
+            // config name separators were changed from dots to underscores
+            // this check is for backwards compatibility and
+            // will be removed in a future version
+            if (!$config && $config = $this->app->retrieve('unique.slugs', null)) {
 
-    // create empty slug field if it doesn't exist
-    if (!isset($entry[$slugName]))
-        $entry[$slugName] = '';
+                if (isset($config['all.collections']))
+                    $config['all_collections'] = $config['all.collections'];
 
-    // get field name from config.yaml
-    if (isset($config['collections'][$name])) {
+                if (isset($config['slug.name']))
+                    $config['slug_name'] = $config['slug.name'];
 
-        $fld = $config['collections'][$name];
-        $fld = is_array($fld) ? $fld : [$fld];
+            }
 
+        }
+
+        return $config;
+
+    },
+
+    'uniqueSlug' => function($name, $entry, $isUpdate) {
+
+        $config = $this->config();
+
+        if (!$config) return $entry;
+
+        // get slug name
+        $slugName = isset($config['slug_name']) ? $config['slug_name'] : 'slug';
+
+        // delimiter for nested fields, e. g. "tags|0" or "asset|title"
         $delim = $config['delimiter'] ?? '|';
+
+        // get field name
+        if (isset($config['collections'][$name])) {
+
+            // generate slug on create only or when an existing one is empty
+            if (!$isUpdate || ($isUpdate && empty($entry[$slugName]))) {
+
+                $fld = $config['collections'][$name];
+                $fld = is_array($fld) ? $fld : [$fld];
+
+                $slugString = $this->findSlugString($entry, $fld, $delim);
+
+                $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
+
+                $slug = $this->incrementSlug($name, $slug, $slugName);
+
+                // save generated slug to "slug"
+                $entry[$slugName] = $slug;
+
+            }
+
+            elseif (!empty($config['check_on_update']) && $isUpdate && !empty($entry[$slugName])) {
+
+                // never trust user input ;-)
+                $slug = $this->app->helper('utils')->sluggify($entry[$slugName]);
+
+                if ($this->slugExists($name, $slug, $slugName)
+                    && !$this->isOwnSlug($name, $slug, $slugName, $entry['_id'])) {
+
+                    $slug = $this->incrementSlug($name, $slug, $slugName);
+
+                }
+
+                $entry[$slugName] = $slug;
+
+            }
+
+        }
+
+        if (isset($config['localize'][$name])) {
+
+            $locales = array_keys($this->app->retrieve('languages', []));
+            $localSlugStrings = [];
+
+            foreach ($locales as $locale) {
+
+                if (!$isUpdate || ($isUpdate && empty($entry[$slugName.'_'.$locale]))) {
+
+                    $fld = $config['localize'][$name];
+                    $fld = is_array($fld) ? $fld : [$fld];
+
+                    $slugString = $this->findSlugString($entry, $fld, $delim, '_'.$locale);
+
+                    $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
+
+                    $slug = $this->incrementSlug($name, $slug, $slugName.'_'.$locale);
+
+                    // save generated slug to "slug_de"
+                    $entry[$slugName.'_'.$locale] = $slug;
+
+                }
+
+                elseif (!empty($config['check_on_update']) && $isUpdate && !empty($entry[$slugName.'_'.$locale])) {
+
+                    // never trust user input ;-)
+                    $slug = $this->app->helper('utils')->sluggify($entry[$slugName.'_'.$locale]);
+
+                    if ($this->slugExists($name, $slug, $slugName.'_'.$locale)
+                        && !$this->isOwnSlug($name, $slug, $slugName.'_'.$locale, $entry['_id'])) {
+
+                        $slug = $this->incrementSlug($name, $slug, $slugName.'_'.$locale);
+
+                    }
+
+                    $entry[$slugName.'_'.$locale] = $slug;
+
+                }
+
+            }
+
+        }
+
+        return $entry;
+
+    },
+
+    'findSlugString' => function($entry, $fld, $delim, $suffix = '') {
 
         $slugString = null;
         foreach ($fld as $val) {
 
-            if (is_string($val) && strpos($val, $delim) === false) {
-                $slugString = $entry[$val] ?? null;
+            if (strpos($val, $delim) === false) {
+                $slugString = !empty($entry[$val.$suffix]) ? $entry[$val.$suffix] : null;
                 if ($slugString) break;
+                continue;
             }
 
             // loop to get nested fields for slug
             $current = $entry;
+            $i = 0;
             foreach (explode($delim, $val) as $key) {
-                if (!isset($current[$key])){
+                if (!isset($current[$i == 0 ? $key.$suffix : $key])){
                     $current = null;
                     break;
                 }
-                $current = &$current[$key];
+                $current = &$current[$i == 0 ? $key.$suffix : $key];
+                $i++;
             }
 
             $slugString = is_string($current) && !empty($current) ? $current : $slugString;
             if ($slugString) break;
         }
-    }
-    else {
-        
-        // to do, use defaults like title/name/first entry/...
-        
-        // setting `all_collections : true` has no effect right now
-        
-        return;
+
+        return $slugString;
+
+    },
+
+    'incrementSlug' => function($name, $slug, $slugName) {
+
+        // fast single check, should always return 1 or 0
+        $count = $this->slugExists($name, $slug, $slugName);
+
+        // slug doesn't exist yet
+        if (!$count) return $slug;
+
+        // try again with a single iteration
+        $count = $this->slugExists($name, $slug.'-1', $slugName);
+
+        if (!$count) return $slug.'-1';
+
+        // more than 1 duplicate - use a regex
+        // a simple count doesn't work, because entries could be deleted
+        $options = [
+            'filter' => [ // find "title" and "title-1", but not "title-test-1" or "title-2-1"
+                $slugName => ['$regex' => '/^'.$slug.'(-\d+|$)$/'],
+            ],
+            'fields' =>  [
+                $slugName => true,
+                '_id' => false,
+            ],
+        ];
+
+        $slugs = array_column($this->app->module('collections')->find($name, $options), $slugName);
+
+        natsort($slugs); // sort natural
+
+        $highest = end($slugs);
+        $count = substr($highest, strrpos($highest, '-') + 1);
+
+        return $slug . '-' . ($count + 1);
+
+    },
+
+    'slugExists' => function($name, $slug, $slugName) {
+
+        // fast single check, should always return 1 or 0
+        return $this->app->module('collections')->count($name, [$slugName => $slug]);
+
+    },
+
+    'isOwnSlug' => function($name, $slug, $slugName, $id) {
+
+        $filter = [
+            $slugName => $slug,
+            '_id' => $id,
+        ];
+        $projection = [
+            '_id' => true,
+        ];
+
+        $_id = $this->app->module('collections')->findOne($name, $filter, $projection);
+
+        if (isset($_id['_id']) && $_id['_id'] == $id) {
+            return true;
+        }
+
+        return false;
+
+    },
+
+]);
+
+// set events
+if ($config = $this->module('uniqueslugs')->config()) {
+
+    if (isset($config['collections']) && is_array($config['collections'])) {
+
+        foreach ($config['collections'] as $col => $field) {
+
+            $app->on("collections.save.before.$col", function($name, &$entry, $isUpdate) {
+                $entry = $this->module('uniqueslugs')->uniqueSlug($name, $entry, $isUpdate);
+            });
+
+        }
 
     }
 
-    // generate slug on create only or when an existing one is empty
-    if (!$isUpdate || ($isUpdate && trim($entry[$slugName]) == '')) {
-
-        $slug = $app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
-
-        // count entries with the same slug
-        $count = $app->module('collections')->count($name, [$slugName => $slug]);
-        
-        // if slug exists already, postfix with incremental count
-        if ($count > 0)
-            $slug = "{$slug}-{$count}";
-        
-        // save generated slug to field with name $slugName
-        $entry[$slugName] = $slug;
-    }
-
-};
-
-// set event handler with uniqueSlug function
-if ($config){
-    if (isset($config['all_collections']) && $config['all_collections'])
-        $app->on("collections.save.before", $uniqueSlug);
-    
-    elseif (isset($config['collections']))
-        foreach ($config['collections'] as $col => $field)
-            $app->on("collections.save.before.$col", $uniqueSlug);
 }
