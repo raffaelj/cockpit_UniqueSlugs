@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.4.2
+ * @version   0.4.3
  * @author    Raffael Jesche
  * @license   MIT
  */
@@ -95,6 +95,8 @@ $this->module('uniqueslugs')->extend([
             $localSlugStrings = [];
 
             foreach ($locales as $locale) {
+
+                if ($locale == 'default') continue;
 
                 if (!$isUpdate || ($isUpdate && empty($entry[$slugName.'_'.$locale]))) {
 
