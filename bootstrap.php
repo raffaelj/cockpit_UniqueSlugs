@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.4.3
+ * @version   0.5.0
  * @author    Raffael Jesche
  * @license   MIT
  */
@@ -18,20 +18,10 @@ $this->module('uniqueslugs')->extend([
 
         if (!isset($config)) {
 
-            $config = $this->app->retrieve('unique_slugs', null);
-
-            // config name separators were changed from dots to underscores
-            // this check is for backwards compatibility and
-            // will be removed in a future version
-            if (!$config && $config = $this->app->retrieve('unique.slugs', null)) {
-
-                if (isset($config['all.collections']))
-                    $config['all_collections'] = $config['all.collections'];
-
-                if (isset($config['slug.name']))
-                    $config['slug_name'] = $config['slug.name'];
-
-            }
+            $config = array_replace_recursive(
+                $this->app->storage->getKey('cockpit/options', 'unique_slugs', []),
+                $this->app->retrieve('unique_slugs', [])
+            );
 
         }
 
@@ -249,4 +239,12 @@ if ($config = $this->module('uniqueslugs')->config()) {
 
     }
 
+}
+
+// acl
+$this('acl')->addResource('uniqueslugs', ['manage']);
+
+// ADMIN
+if (COCKPIT_ADMIN && !COCKPIT_API_REQUEST) {
+    include_once('admin.php');
 }

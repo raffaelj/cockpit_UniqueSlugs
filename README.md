@@ -13,13 +13,26 @@ git clone https://github.com/raffaelj/cockpit_UniqueSlugs.git addons/UniqueSlugs
 
 ## How to use
 
-Add these options to `cockpit/config/config.yaml` to specify the collections and field names for slug generation:
+Use the GUI. If you are no admin, your user group needs manage rights.
+
+![uniqueslugs-gui](https://user-images.githubusercontent.com/13042193/59967705-2c8d4200-952e-11e9-95d0-82e1cc21e4ad.png)
+
+Or add these options to `cockpit/config/config.yaml` to specify the collections and field names for slug generation:
 
 ```yaml
+# UniqueSlugs example
 unique_slugs:
     collections:
         pages     : title
         products  : name
+
+# ACL example
+groups:
+    manager:
+        cockpit:
+            backend: true
+        uniqueslugs:
+            manage: true
 ```
 
 all options:
@@ -49,38 +62,18 @@ unique_slugs:
 
 ## Notes:
 
+Hardcoded settings in the config file will override gui settings.
+
 Don't set `slug_name: fieldname_slug` if you also set `{"slug": true}` in the `fieldname` options for some reason. It should work, but it fails on multilingual setups ([explanation][3]).
 
 Your collection can have a visible field named "slug", if you want to edit it by hand.
 
 The builtin option to sluggify text fields via options `{"slug": true}` in the 
-backend uses Javascript <del>and leads to different results ("ä" becomes "a" 
-instead of "ae")</del> ([fixed][1]). **If you want unique slugs, that option is not necessary anymore.**
+backend uses Javascript. **If you want unique slugs, that option is not necessary anymore.**
 
 The code for this addon is inspired by a [gist from fabianmu][4].
 
 Thanks to [fabianmu][5] and [aheinze][6]
-
-## Changelog
-
-**0.4.2**
-
-* rewrite to object oriented style
-* added support for localized fields
-* incremental count didn't work correctly in the past - fixed
-* added optional unique check on each update, e. g. if user changes slug by hand, enable it with `check_on_update: true`
-
-**2018-10-25**
-
-* fixed error if nested key doesn't exist
-* added placeholder to avoid empty strings as slugs
-
-**2018-10-19**
-
-* added ability to use multiple fields for slug generation
-* added nested fields for slug generation
-* config name separators were changed from dots to underscores
-  * added check for backwards compatibility - will be removed in the future
 
 [1]: https://github.com/agentejo/cockpit/commit/fc7bb9cbe7dc2bb69f8f34ca2e899b9ad49f33fc#diff-dbdace793615e1dc2b38f69bdac96950
 [2]: https://github.com/agentejo/cockpit
