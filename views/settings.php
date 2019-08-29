@@ -101,10 +101,12 @@
 
         riot.util.bind(this);
 
-        this.config = {{ json_encode($config) }};
+        this.config = {{ !empty($config) ? json_encode($config) : '{}' }};
         this.collections = {{ json_encode($collections) }};
 
         this.on('mount', function() {
+            
+            console.log(this.config);
 
             // bind global command + save
             Mousetrap.bindGlobal(['command+s', 'ctrl+s'], function(e) {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+* fixed: GUI didn't save on first run, because of a wrong variable type (empty object/array)
+
 ## 0.5.0
 
 * added GUI

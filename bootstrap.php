@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.5.0
+ * @version   0.5.1
  * @author    Raffael Jesche
  * @license   MIT
  */
