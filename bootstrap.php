@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.5.1
+ * @version   0.5.2
  * @author    Raffael Jesche
  * @license   MIT
  */
@@ -44,8 +44,12 @@ $this->module('uniqueslugs')->extend([
         // get field name
         if (isset($config['collections'][$name])) {
 
-            // generate slug on create only or when an existing one is empty
-            if (!$isUpdate || ($isUpdate && empty($entry[$slugName]))) {
+            // generate slug on create only or when an existing one is an empty string
+            if (!$isUpdate
+                || ($isUpdate
+                    && isset($entry[$slugName])
+                    && $entry[$slugName] == ''))
+                {
 
                 $fld = $config['collections'][$name];
                 $fld = is_array($fld) ? $fld : [$fld];
@@ -61,7 +65,11 @@ $this->module('uniqueslugs')->extend([
 
             }
 
-            elseif (!empty($config['check_on_update']) && $isUpdate && !empty($entry[$slugName])) {
+            elseif (!empty($config['check_on_update'])
+                    && $isUpdate
+                    && isset($entry[$slugName])
+                    && $entry[$slugName] == '')
+                {
 
                 // never trust user input ;-)
                 $slug = $this->app->helper('utils')->sluggify($entry[$slugName]);
@@ -88,7 +96,11 @@ $this->module('uniqueslugs')->extend([
 
                 if ($locale == 'default') continue;
 
-                if (!$isUpdate || ($isUpdate && empty($entry[$slugName.'_'.$locale]))) {
+                if (!$isUpdate
+                    || ($isUpdate
+                        && isset($entry[$slugName.'_'.$locale])
+                        && $entry[$slugName.'_'.$locale] == ''))
+                    {
 
                     $fld = $config['localize'][$name];
                     $fld = is_array($fld) ? $fld : [$fld];
@@ -104,7 +116,11 @@ $this->module('uniqueslugs')->extend([
 
                 }
 
-                elseif (!empty($config['check_on_update']) && $isUpdate && !empty($entry[$slugName.'_'.$locale])) {
+                elseif (!empty($config['check_on_update'])
+                        && $isUpdate
+                        && isset($entry[$slugName.'_'.$locale])
+                        && $entry[$slugName.'_'.$locale] == '')
+                    {
 
                     // never trust user input ;-)
                     $slug = $this->app->helper('utils')->sluggify($entry[$slugName.'_'.$locale]);

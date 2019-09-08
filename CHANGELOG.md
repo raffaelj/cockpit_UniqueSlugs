@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2
+
+* fixed overwriting of slug when saving only partial data (via custom php script or via api)
+
 ## 0.5.1
 
 * fixed: GUI didn't save on first run, because of a wrong variable type (empty object/array)
