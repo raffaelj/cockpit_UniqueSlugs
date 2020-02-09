@@ -47,8 +47,8 @@ $this->module('uniqueslugs')->extend([
             // generate slug on create only or when an existing one is an empty string
             if (!$isUpdate
                 || ($isUpdate
-                    && isset($entry[$slugName])
-                    && $entry[$slugName] == ''))
+                    && array_key_exists($slugName, $entry)
+                    && ($entry[$slugName] == '' || $entry[$slugName] == null)))
                 {
 
                 $fld = $config['collections'][$name];
@@ -67,8 +67,8 @@ $this->module('uniqueslugs')->extend([
 
             elseif (!empty($config['check_on_update'])
                     && $isUpdate
-                    && isset($entry[$slugName])
-                    && $entry[$slugName] == '')
+                    && array_key_exists($slugName, $entry)
+                    && ($entry[$slugName] == '' || $entry[$slugName] == null))
                 {
 
                 // never trust user input ;-)
@@ -98,8 +98,8 @@ $this->module('uniqueslugs')->extend([
 
                 if (!$isUpdate
                     || ($isUpdate
-                        && isset($entry[$slugName.'_'.$locale])
-                        && $entry[$slugName.'_'.$locale] == ''))
+                        && array_key_exists($slugName.'_'.$locale, $entry)
+                        && ($entry[$slugName.'_'.$locale] === '' || $entry[$slugName.'_'.$locale] === null)))
                     {
 
                     $fld = $config['localize'][$name];
@@ -118,8 +118,8 @@ $this->module('uniqueslugs')->extend([
 
                 elseif (!empty($config['check_on_update'])
                         && $isUpdate
-                        && isset($entry[$slugName.'_'.$locale])
-                        && $entry[$slugName.'_'.$locale] == '')
+                        && array_key_exists($slugName.'_'.$locale, $entry)
+                        && ($entry[$slugName.'_'.$locale] == '' || $entry[$slugName.'_'.$locale] == null))
                     {
 
                     // never trust user input ;-)
