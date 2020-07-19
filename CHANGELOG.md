@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3
+
+* moved collections events into `cockpit.bootstrap` event with priority 100 to allow dynamic config modifications before the events are assigned
+
 ## 0.5.2
 
 * fixed overwriting of slug when saving only partial data (via custom php script or via api)

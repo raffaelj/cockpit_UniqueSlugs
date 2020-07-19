@@ -5,7 +5,7 @@
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
  * 
- * @version   0.5.2
+ * @version   0.5.3
  * @author    Raffael Jesche
  * @license   MIT
  */
@@ -241,13 +241,17 @@ $this->module('uniqueslugs')->extend([
 ]);
 
 // set events
-if ($config = $this->module('uniqueslugs')->config()) {
+$this->on('cockpit.bootstrap', function() {
+
+    $config = $this->module('uniqueslugs')->config();
+
+    if (!$config) return;
 
     if (isset($config['collections']) && is_array($config['collections'])) {
 
         foreach ($config['collections'] as $col => $field) {
 
-            $app->on("collections.save.before.$col", function($name, &$entry, $isUpdate) {
+            $this->on("collections.save.before.$col", function($name, &$entry, $isUpdate) {
                 $entry = $this->module('uniqueslugs')->uniqueSlug($name, $entry, $isUpdate);
             });
 
@@ -255,7 +259,7 @@ if ($config = $this->module('uniqueslugs')->config()) {
 
     }
 
-}
+}, 100);
 
 // acl
 $this('acl')->addResource('uniqueslugs', ['manage']);
