@@ -266,5 +266,5 @@ $this('acl')->addResource('uniqueslugs', ['manage']);
 
 // ADMIN
 if (COCKPIT_ADMIN && !COCKPIT_API_REQUEST) {
-    include_once('admin.php');
+    include_once(__DIR__.'/admin.php');
 }
