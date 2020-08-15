@@ -1,0 +1,23 @@
+{
+    "name": "raffaelj/cockpit-uniqueslugs",
+    "type": "cockpit-module",
+    "description": "Unique slugs for collecion entries in Cockpit CMS",
+    "keywords": ["cockpit", "slugs"],
+    "homepage": "https://github.com/raffaelj/cockpit_UniqueSlugs",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raffael Jesche",
+            "homepage": "https://www.rlj.me"
+        }
+    ],
+    "require": {
+        "composer/installers": "^1.9"
+    },
+    "config": {
+        "vendor-dir": "lib/vendor"
+    },
+    "extra": {
+        "installer-name": "UniqueSlugs"
+    }
+}
