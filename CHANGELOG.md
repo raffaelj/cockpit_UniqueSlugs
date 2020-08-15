@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4
+
+* fixed missing `__DIR__` in admin include
+* added `composer.json`
+
 ## 0.5.3
 
 * moved collections events into `cockpit.bootstrap` event with priority 100 to allow dynamic config modifications before the events are assigned
