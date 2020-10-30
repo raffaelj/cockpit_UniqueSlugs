@@ -1,7 +1,7 @@
 {
     "name": "raffaelj/cockpit-uniqueslugs",
     "type": "cockpit-module",
-    "description": "Unique slugs for collecion entries in Cockpit CMS",
+    "description": "Unique slugs for collection entries in Cockpit CMS",
     "keywords": ["cockpit", "slugs"],
     "homepage": "https://github.com/raffaelj/cockpit_UniqueSlugs",
     "license": "MIT",
