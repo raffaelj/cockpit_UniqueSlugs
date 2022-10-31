@@ -13,9 +13,9 @@
         <div class="">
 
             <div class="uk-panel uk-panel-box uk-panel-card uk-margin uk-width-1-1">
-                
+
                 <div class="uk-width-1-1 uk-grid uk-container-center">
-            
+
                     <div class="uk-width-small-1-2 uk-width-medium-1-4 uk-margin-small">
                         <label class="uk-display-block uk-margin-small">
                             @lang('Slug name')
@@ -50,7 +50,7 @@
 
                 </div>
             </div>
-            
+
             <div class="uk-panel uk-panel-box uk-panel-card uk-margin uk-width-1-1">
 
                 <label class="uk-display-block uk-margin-small">@lang('Collections')</label>
@@ -105,7 +105,7 @@
         this.collections = {{ json_encode($collections) }};
 
         this.on('mount', function() {
-            
+
             console.log(this.config);
 
             // bind global command + save

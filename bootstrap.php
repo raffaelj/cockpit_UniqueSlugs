@@ -1,11 +1,11 @@
 <?php
 /**
  * unique slugs for Cockpit CMS
- * 
+ *
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
- * 
- * @version   0.5.3
+ *
+ * @version   0.5.4
  * @author    Raffael Jesche
  * @license   MIT
  */
