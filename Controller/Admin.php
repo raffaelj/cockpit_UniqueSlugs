@@ -45,4 +45,44 @@ class Admin extends \Cockpit\AuthController {
 
     }
 
+    public function updateEntriesWithoutSlug() {
+
+        $config = $this->app->module('uniqueslugs')->config();
+
+        $slugName = isset($config['slug_name']) ? $config['slug_name'] : 'slug';
+
+        $results = [];
+
+        foreach ($config['collections'] as $name => $fieldNames) {
+
+            $entries = (array)$this->app->storage->find("collections/{$name}");
+
+            foreach ($entries as &$entry) {
+
+                if (!array_key_exists($slugName, $entry)
+                    || $entry[$slugName] === null
+                    || $entry[$slugName] === ''
+                ) {
+
+                    $isUpdate = false;
+                    $entry = $this->app->module('uniqueslugs')->getEntryWithUniqueSlug($name, $entry, $isUpdate);
+
+                    $ret = $this->app->storage->save("collections/{$name}", $entry);
+
+                    if ($ret) {
+                        $results[$name][] = [
+                            '_id' => $entry['_id'],
+                            $slugName => $entry[$slugName],
+                        ];
+                    }
+                }
+
+            }
+
+        }
+
+        return $results;
+
+    }
+
 }
