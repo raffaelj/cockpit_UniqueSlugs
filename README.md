@@ -10,61 +10,135 @@ Unique slugs for collections in [Cockpit CMS][2]
 
 ## Installation
 
-Copy this repository into `/addons` and name it `UniqueSlugs` or
+Copy this repository into `/addons` and name it `UniqueSlugs` or use the cli.
+
+### via git
 
 ```bash
 cd path/to/cockpit
 git clone https://github.com/raffaelj/cockpit_UniqueSlugs.git addons/UniqueSlugs
 ```
 
+### via cp cli
+
+```bash
+cd path/to/cockpit
+./cp install/addon --name UniqueSlugs --url https://github.com/raffaelj/cockpit_UniqueSlugs/archive/master.zip
+```
+
+### via composer
+
+Make sure, that the path to cockpit addons is defined in your projects' `composer.json` file.
+
+```json
+{
+    "name": "my/cockpit-project",
+    "extra": {
+        "installer-paths": {
+            "addons/{$name}": ["type:cockpit-module"]
+        }
+    }
+}
+```
+
+```bash
+cd path/to/cockpit-root
+composer create-project --ignore-platform-reqs aheinze/cockpit .
+composer config extra.installer-paths.addons/{\$name} "type:cockpit-module"
+
+composer require --ignore-platform-reqs raffaelj/cockpit-uniqueslugs
+```
+
 ## How to use
 
-Use the GUI. If you are no admin, your user group needs manage rights.
+Add these options to `path/to/cockpit/config/config.php` to specify the collections and field names for slug generation:
 
-![uniqueslugs-gui](https://user-images.githubusercontent.com/13042193/59967705-2c8d4200-952e-11e9-95d0-82e1cc21e4ad.png)
+```php
+<?php
 
-Or add these options to `cockpit/config/config.yaml` to specify the collections and field names for slug generation:
+return [
+    'app.name' => 'my app',
 
-```yaml
-# UniqueSlugs example
-unique_slugs:
-    collections:
-        pages     : title
-        products  : name
+    // unique slugs
+    'unique_slugs' => [
+        'collections'    => [
+            'pages'      => 'title',
+            'products'   => 'name',
+        ],
+        'localize' => [
+            'pages'     => 'title',
+            'products'  => 'name',
+            ],
+        ],
+    ],
 
-# ACL example
-groups:
-    manager:
-        cockpit:
-            backend: true
-        uniqueslugs:
-            manage: true
+    // ACL example
+    'groups' => [
+        'manager' => [
+            'cockpit' => [
+                'backend' => true,
+            ],
+            'uniqueslugs' => [
+                'manage' => true,
+            ],
+        ],
+    ],
+];
 ```
 
 all options:
 
-```yaml
-# unique slugs
-unique_slugs:
-    slug_name      : slug        # default: "slug"
-    placeholder    : page        # default: "entry"
-    check_on_update: true        # default: false, unique checks on each update (if user changes slug by hand)
-    delimiter      : |           # default: "|", is used for nested fields
-    collections    :
-        pages      : title
-        products   : name
-        something  :             # use multiple fields as fallbacks
-            - title
-            - name
-            - image|meta|title   # use nested fields for slugs
-    localize       :             # for localized fields, omitted if not set
-        pages      : title       # field name without suffix ("_de")
-        products   : name
-        something  :             # use multiple fields as fallbacks
-            - title
-            - name
-            - image|meta|title   # use nested fields for slugs
+```php
+<?php
+
+return [
+    'app.name' => 'my app',
+
+    // unique slugs
+    'unique_slugs' => [
+        'slug_name'      => 'slug', // default: "slug"
+        'placeholder'    => 'page', // default: "entry"
+        'check_on_update' => true,  // default: false, unique checks on each
+                                    // update (if user changes slug by hand)
+        'delimiter'      => '|',    // default: "|", is used for nested fields
+
+        'collections'    => [
+            'pages'      => 'title',
+            'products'   => 'name',
+            'something'  => [       // use multiple fields as fallbacks
+                'title',
+                'name',
+                'image|meta|title', // use nested fields for slugs
+            ],
+        ],
+        'localize' => [             // for localized fields, omitted if not set
+            'pages'     => 'title', // field name without suffix ("_de")
+            'products'  => 'name',
+            'something' => [        // use multiple fields as fallbacks
+                'title',
+                'name',
+                'image|meta|title', // use nested fields for slugs
+            ],
+        ],
+    ],
+
+    // ACL example
+    'groups' => [
+        'manager' => [
+            'cockpit' => [
+                'backend' => true,
+            ],
+            'uniqueslugs' => [
+                'manage' => true,
+            ],
+        ],
+    ],
+];
 ```
+
+Or use the GUI. If you are no admin, your user group needs manage rights.
+
+![uniqueslugs-gui](https://user-images.githubusercontent.com/13042193/59967705-2c8d4200-952e-11e9-95d0-82e1cc21e4ad.png)
 
 ## Notes:
 
@@ -74,8 +148,7 @@ Don't set `slug_name: fieldname_slug` if you also set `{"slug": true}` in the `f
 
 Your collection can have a visible field named "slug", if you want to edit it by hand.
 
-The builtin option to sluggify text fields via options `{"slug": true}` in the 
-backend uses Javascript. **If you want unique slugs, that option is not necessary anymore.**
+The builtin option to sluggify text fields via options `{"slug": true}` in the backend uses Javascript. **If you want unique slugs, that option is not necessary anymore.**
 
 The code for this addon is inspired by a [gist from fabianmu][4].
 
