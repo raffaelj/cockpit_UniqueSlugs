@@ -51,10 +51,10 @@ $this->module('uniqueslugs')->extend([
                     && ($entry[$slugName] == '' || $entry[$slugName] == null)))
                 {
 
-                $fld = $config['collections'][$name];
-                $fld = is_array($fld) ? $fld : [$fld];
+                $fieldNames = $config['collections'][$name];
+                $fieldNames = is_array($fieldNames) ? $fieldNames : [$fieldNames];
 
-                $slugString = $this->findSlugString($entry, $fld, $delim);
+                $slugString = $this->findSlugString($entry, $fieldNames, $delim);
 
                 $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
 
@@ -102,10 +102,10 @@ $this->module('uniqueslugs')->extend([
                         && ($entry[$slugName.'_'.$locale] === '' || $entry[$slugName.'_'.$locale] === null)))
                     {
 
-                    $fld = $config['localize'][$name];
-                    $fld = is_array($fld) ? $fld : [$fld];
+                    $fieldNames = $config['localize'][$name];
+                    $fieldNames = is_array($fieldNames) ? $fieldNames : [$fieldNames];
 
-                    $slugString = $this->findSlugString($entry, $fld, $delim, '_'.$locale);
+                    $slugString = $this->findSlugString($entry, $fieldNames, $delim, '_'.$locale);
 
                     $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
 
@@ -144,10 +144,10 @@ $this->module('uniqueslugs')->extend([
 
     },
 
-    'findSlugString' => function($entry, $fld, $delim, $suffix = '') {
+    'findSlugString' => function($entry, $fieldNames, $delim, $suffix = '') {
 
         $slugString = null;
-        foreach ($fld as $val) {
+        foreach ($fieldNames as $val) {
 
             if (strpos($val, $delim) === false) {
                 $slugString = !empty($entry[$val.$suffix]) ? $entry[$val.$suffix] : null;
