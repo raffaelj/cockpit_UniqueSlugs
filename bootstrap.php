@@ -41,100 +41,69 @@ $this->module('uniqueslugs')->extend([
         // delimiter for nested fields, e. g. "tags|0" or "asset|title"
         $delim = $config['delimiter'] ?? '|';
 
-        // get field name
-        if (isset($config['collections'][$name])) {
+        $defaultLocale = $this->app->retrieve('i18n', 'en');
+        $languages = $this->app->retrieve('languages', []);
 
-            // generate slug on create only or when an existing one is an empty string
+        $locales = [$defaultLocale];
+        foreach ($languages as $code => $label) {
+            if ($code == 'default') continue;
+            $locales[] = $code;
+        }
+
+        foreach ($locales as $locale) {
+
+            if ($locale == $defaultLocale) {
+
+                if (!isset($config['collections'][$name])) continue;
+
+                $langSuffix = '';
+                $configKey = 'collections';
+            }
+            else {
+
+                if (!isset($config['localize'][$name])) continue;
+
+                $langSuffix = "_{$locale}";
+                $configKey = 'localize';
+            }
+
             if (!$isUpdate
                 || ($isUpdate
-                    && array_key_exists($slugName, $entry)
-                    && ($entry[$slugName] == '' || $entry[$slugName] == null)))
+                    && array_key_exists($slugName.$langSuffix, $entry)
+                    && ($entry[$slugName.$langSuffix] === '' || $entry[$slugName.$langSuffix] === null)))
                 {
 
-                $fieldNames = $config['collections'][$name];
+                $fieldNames = $config[$configKey][$name];
                 $fieldNames = is_array($fieldNames) ? $fieldNames : [$fieldNames];
 
-                $slugString = $this->findSlugString($entry, $fieldNames, $delim);
+                $slugString = $this->findSlugString($entry, $fieldNames, $delim, $langSuffix);
 
                 $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
 
-                $slug = $this->incrementSlug($name, $slug, $slugName);
+                $slug = $this->incrementSlug($name, $slug, $slugName.$langSuffix);
 
-                // save generated slug to "slug"
-                $entry[$slugName] = $slug;
+                // save generated slug to "slug_de"
+                $entry[$slugName.$langSuffix] = $slug;
 
             }
 
             elseif (!empty($config['check_on_update'])
                     && $isUpdate
-                    && array_key_exists($slugName, $entry)
-                    && ($entry[$slugName] == '' || $entry[$slugName] == null))
+                    && array_key_exists($slugName.$langSuffix, $entry)
+                    && ($entry[$slugName.$langSuffix] == '' || $entry[$slugName.$langSuffix] == null))
                 {
 
                 // never trust user input ;-)
-                $slug = $this->app->helper('utils')->sluggify($entry[$slugName]);
+                $slug = $this->app->helper('utils')->sluggify($entry[$slugName.$langSuffix]);
 
-                if ($this->slugExists($name, $slug, $slugName)
-                    && !$this->isOwnSlug($name, $slug, $slugName, $entry['_id'])) {
+                if ($this->slugExists($name, $slug, $slugName.$langSuffix)
+                    && !$this->isOwnSlug($name, $slug, $slugName.$langSuffix, $entry['_id'])) {
 
-                    $slug = $this->incrementSlug($name, $slug, $slugName);
-
-                }
-
-                $entry[$slugName] = $slug;
-
-            }
-
-        }
-
-        if (isset($config['localize'][$name])) {
-
-            $locales = array_keys($this->app->retrieve('languages', []));
-            $localSlugStrings = [];
-
-            foreach ($locales as $locale) {
-
-                if ($locale == 'default') continue;
-
-                if (!$isUpdate
-                    || ($isUpdate
-                        && array_key_exists($slugName.'_'.$locale, $entry)
-                        && ($entry[$slugName.'_'.$locale] === '' || $entry[$slugName.'_'.$locale] === null)))
-                    {
-
-                    $fieldNames = $config['localize'][$name];
-                    $fieldNames = is_array($fieldNames) ? $fieldNames : [$fieldNames];
-
-                    $slugString = $this->findSlugString($entry, $fieldNames, $delim, '_'.$locale);
-
-                    $slug = $this->app->helper('utils')->sluggify($slugString ? $slugString : ($config['placeholder'] ?? 'entry'));
-
-                    $slug = $this->incrementSlug($name, $slug, $slugName.'_'.$locale);
-
-                    // save generated slug to "slug_de"
-                    $entry[$slugName.'_'.$locale] = $slug;
+                    $slug = $this->incrementSlug($name, $slug, $slugName.$langSuffix);
 
                 }
 
-                elseif (!empty($config['check_on_update'])
-                        && $isUpdate
-                        && array_key_exists($slugName.'_'.$locale, $entry)
-                        && ($entry[$slugName.'_'.$locale] == '' || $entry[$slugName.'_'.$locale] == null))
-                    {
-
-                    // never trust user input ;-)
-                    $slug = $this->app->helper('utils')->sluggify($entry[$slugName.'_'.$locale]);
-
-                    if ($this->slugExists($name, $slug, $slugName.'_'.$locale)
-                        && !$this->isOwnSlug($name, $slug, $slugName.'_'.$locale, $entry['_id'])) {
-
-                        $slug = $this->incrementSlug($name, $slug, $slugName.'_'.$locale);
-
-                    }
-
-                    $entry[$slugName.'_'.$locale] = $slug;
-
-                }
+                $entry[$slugName.$langSuffix] = $slug;
 
             }
 
