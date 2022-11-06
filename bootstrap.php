@@ -29,7 +29,7 @@ $this->module('uniqueslugs')->extend([
 
     },
 
-    'uniqueSlug' => function($name, $entry, $isUpdate) {
+    'getEntryWithUniqueSlug' => function($name, $entry, $isUpdate) {
 
         $config = $this->config();
 
@@ -221,7 +221,7 @@ $this->on('cockpit.bootstrap', function() {
         foreach ($config['collections'] as $col => $field) {
 
             $this->on("collections.save.before.$col", function($name, &$entry, $isUpdate) {
-                $entry = $this->module('uniqueslugs')->uniqueSlug($name, $entry, $isUpdate);
+                $entry = $this->module('uniqueslugs')->getEntryWithUniqueSlug($name, $entry, $isUpdate);
             });
 
         }
