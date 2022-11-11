@@ -57,14 +57,14 @@ $this->module('uniqueslugs')->extend([
                 if (!isset($config['collections'][$name])) continue;
 
                 $langSuffix = '';
-                $configKey = 'collections';
+                $fieldNames = $config['collections'][$name];
             }
             else {
 
                 if (!isset($config['localize'][$name])) continue;
 
                 $langSuffix = "_{$locale}";
-                $configKey = 'localize';
+                $fieldNames = $config['localize'][$name];
             }
 
             if (!$isUpdate
@@ -73,7 +73,6 @@ $this->module('uniqueslugs')->extend([
                     && ($entry[$slugName.$langSuffix] === '' || $entry[$slugName.$langSuffix] === null)))
                 {
 
-                $fieldNames = $config[$configKey][$name];
                 $fieldNames = is_array($fieldNames) ? $fieldNames : [$fieldNames];
 
                 $slugString = $this->findSlugString($entry, $fieldNames, $delim, $langSuffix);
