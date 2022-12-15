@@ -2,7 +2,7 @@
 <div>
     <ul class="uk-breadcrumb">
         <li><a href="@route('/settings')">@lang('Settings')</a></li>
-        <li class="uk-active"><span>@lang('UniqueSlugs')</span></li>
+        <li class="uk-active"><span>UniqueSlugs</span></li>
     </ul>
 </div>
 
@@ -10,78 +10,75 @@
 
     <form class="uk-form" onsubmit="{ submit }">
 
-        <div class="">
+        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-panel-card uk-panel-header uk-margin">
 
-            <div class="uk-panel uk-panel-box uk-panel-card uk-margin uk-width-1-1">
+            <h2 class="uk-panel-title">@lang('Config')</h2>
 
-                <div class="uk-width-1-1 uk-grid uk-container-center">
+            <div class="uk-grid uk-grid-match uk-grid-width-medium-1-2" data-uk-grid-margin>
 
-                    <div class="uk-width-small-1-2 uk-width-medium-1-4 uk-margin-small">
+                <div>
+                    <div class="uk-panel-box uk-panel-card">
                         <label class="uk-display-block uk-margin-small">
                             @lang('Slug name')
-                            <i class="uk-icon-info-circle" title="@lang('Default: slug')" data-uk-tooltip></i>
                         </label>
-                        <field-text bind="config.slug_name"></field-text>
+                        <input type="text" class="uk-width-1-1" bind="config.slug_name" />
+                        <div class="uk-alert">@lang('Default:') <code>slug</code></div>
                     </div>
+                </div>
 
-                    <div class="uk-width-small-1-2 uk-width-medium-1-4 uk-margin-small">
+                <div>
+                    <div class="uk-panel-box uk-panel-card">
                         <label class="uk-display-block uk-margin-small">
                             @lang('Placeholder')
-                            <i class="uk-icon-info-circle" title="@lang('Default: entry - fallback, if title is empty')" data-uk-tooltip></i>
                         </label>
-                        <field-text bind="config.placeholder"></field-text>
+                        <input type="text" class="uk-width-1-1" bind="config.placeholder" />
+                        <div class="uk-alert">@lang('Default:') <code>entry</code><br>(@lang('Fallback, if title is empty'))</div>
                     </div>
+                </div>
 
-                    <div class="uk-width-small-1-2 uk-width-medium-1-4 uk-margin-small">
+                <div>
+                    <div class="uk-panel-box uk-panel-card">
                         <label class="uk-display-block uk-margin-small">
                             @lang('Check on update')
-                            <i class="uk-icon-info-circle" title="@lang('Default: false - Enabled: Check for uniqueness on each entry update. Disabled: Check only, when the entry is created.')" data-uk-tooltip></i>
                         </label>
                         <field-boolean bind="config.check_on_update"></field-boolean>
+                        <div class="uk-alert">@lang('Default:') <code>false</code><br>@lang('Enabled: Check for uniqueness on each entry update. Disabled: Check only, when the entry is created.')</div>
                     </div>
+                </div>
 
-                    <div class="uk-width-small-1-2 uk-width-medium-1-4 uk-margin-small">
+                <div>
+                    <div class="uk-panel-box uk-panel-card">
                         <label class="uk-display-block uk-margin-small">
                             @lang('Delimiter')
-                            <i class="uk-icon-info-circle" title="@lang('Default: | - If you use nested fields for slug generation, like image titles, use the delimiter. Example: image|meta|title')" data-uk-tooltip></i>
                         </label>
-                        <field-text bind="config.delimiter"></field-text>
+                        <input type="text" class="uk-width-1-1" bind="config.delimiter" />
+                        <div class="uk-alert">@lang('Default:') <code>|</code><br>@lang('If you use nested fields for slug generation, like image titles, use the delimiter.')<br>@lang('Example:') <code>image|meta|title</code></div>
                     </div>
-
                 </div>
+
+            </div>
+        </div>
+
+        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-panel-card uk-panel-header uk-margin">
+
+            <h2 class="uk-panel-title">@lang('Collections')</h2>
+
+            <div class="uk-panel-box uk-panel-card uk-panel-header uk-margin" each="{ collection in collections }">
+
+                <h3 class="uk-panel-title">{ collection.label || collection.name }</h3>
+
+                <div class="uk-display-inline-block">
+                    <field-tags bind="config.collections.{collection.name}" autocomplete="{ autocomplete(collection.fields) }" placeholder="@lang('Add field name')"></field-tags>
+                </div>
+
+                <div class="uk-display-inline-block">
+                    <i class="uk-icon-globe" title="@lang('Localize')" data-uk-tooltip></i>
+
+                    <field-tags class="uk-display-inline-block" bind="config.localize.{collection.name}" autocomplete="{ autocomplete(collection.fields) }" placeholder="@lang('Add field name')"></field-tags>
+                </div>
+
             </div>
 
-            <div class="uk-panel uk-panel-box uk-panel-card uk-margin uk-width-1-1">
-
-                <label class="uk-display-block uk-margin-small">@lang('Collections')</label>
-
-                <div class="uk-width-1-1">
-
-                    <div class="uk-width-1-1">
-
-                        <div class="uk-width-1-1 uk-panel-box uk-panel-card uk-margin-small" each="{ collection in collections }">
-
-                            <label class="uk-display-block uk-margin-small">{ collection.label || collection.name }</label>
-
-                            <div class="">
-
-                                <div class="uk-display-inline-block">
-                                <field-tags bind="config.collections.{collection.name}" autocomplete="{ autocomplete(collection.fields) }" placeholder="@lang('Add field name')"></field-tags>
-                                </div>
-
-                                <div class="uk-display-inline-block">
-                                <i class="uk-icon-globe" title="@lang('Localize')" data-uk-tooltip></i>
-
-                                <field-tags class="uk-display-inline-block" bind="config.localize.{collection.name}" autocomplete="{ autocomplete(collection.fields) }" placeholder="@lang('Add field name')"></field-tags>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
         </div>
 
         <cp-actionbar>
@@ -105,8 +102,6 @@
         this.collections = {{ json_encode($collections) }};
 
         this.on('mount', function() {
-
-            console.log(this.config);
 
             // bind global command + save
             Mousetrap.bindGlobal(['command+s', 'ctrl+s'], function(e) {
@@ -133,7 +128,6 @@
 
                if (data) {
                    App.ui.notify("Saving successful", "success");
-                   console.log(data);
                 } else {
                     App.ui.notify("Saving failed.", "danger");
                 }
