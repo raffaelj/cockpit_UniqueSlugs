@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.5
+
+* improved UI
+* some code restructuring
+* added option to initialize missing slugs of existing entries
+
 ## 0.5.4
 
 * fixed missing `__DIR__` in admin include

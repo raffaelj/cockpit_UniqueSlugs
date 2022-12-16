@@ -1,13 +1,13 @@
 <?php
 /**
- * unique slugs for Cockpit CMS
+ * Unique slugs for collection entries in Cockpit CMS v1
+ *
+ * @version   0.5.5
+ * @author    Raffael Jesche
+ * @license   MIT
  *
  * @see       https://github.com/raffaelj/cockpit_UniqueSlugs/
  * @see       https://github.com/agentejo/cockpit/
- *
- * @version   0.5.4
- * @author    Raffael Jesche
- * @license   MIT
  */
 
 $this->module('uniqueslugs')->extend([
