@@ -10,7 +10,7 @@
 
     <form class="uk-form" onsubmit="{ submit }">
 
-        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-panel-card uk-panel-header uk-margin">
+        <div class="uk-panel uk-panel-box uk-panel-box-trans uk-panel-card uk-panel-header uk-margin">
 
             <h2 class="uk-panel-title">@lang('Config')</h2>
 
@@ -22,7 +22,9 @@
                             @lang('Slug name')
                         </label>
                         <input type="text" class="uk-width-1-1" bind="config.slug_name" />
-                        <div class="uk-alert">@lang('Default:') <code>slug</code></div>
+                        <div class="uk-alert">
+                            <p>@lang('Default:') <code>slug</code></p>
+                        </div>
                     </div>
                 </div>
 
@@ -32,7 +34,10 @@
                             @lang('Placeholder')
                         </label>
                         <input type="text" class="uk-width-1-1" bind="config.placeholder" />
-                        <div class="uk-alert">@lang('Default:') <code>entry</code><br>(@lang('Fallback, if title is empty'))</div>
+                        <div class="uk-alert">
+                            <p>@lang('Default:') <code>entry</code></p>
+                            <p>@lang('Fallback, if title is empty')</p>
+                        </div>
                     </div>
                 </div>
 
@@ -42,7 +47,11 @@
                             @lang('Check on update')
                         </label>
                         <field-boolean bind="config.check_on_update"></field-boolean>
-                        <div class="uk-alert">@lang('Default:') <code>false</code><br>@lang('Enabled: Check for uniqueness on each entry update. Disabled: Check only, when the entry is created.')</div>
+                        <div class="uk-alert">
+                            <p>@lang('Default:') <code>false</code></p>
+                            <p>@lang('Enabled: Check for uniqueness on each entry update.')</p>
+                            <p>@lang('Disabled: Check only, when the entry is created.')</p>
+                        </div>
                     </div>
                 </div>
 
@@ -52,14 +61,18 @@
                             @lang('Delimiter')
                         </label>
                         <input type="text" class="uk-width-1-1" bind="config.delimiter" />
-                        <div class="uk-alert">@lang('Default:') <code>|</code><br>@lang('If you use nested fields for slug generation, like image titles, use the delimiter.')<br>@lang('Example:') <code>image|meta|title</code></div>
+                        <div class="uk-alert">
+                            <p>@lang('Default:') <code>|</code></p>
+                            <p>@lang('If you use nested fields for slug generation, like image titles, use the delimiter.')</p>
+                            <p>@lang('Example:') <code>image|meta|title</code></p>
+                        </div>
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-panel-card uk-panel-header uk-margin">
+        <div class="uk-panel uk-panel-box uk-panel-box-trans uk-panel-card uk-panel-header uk-margin">
 
             <h2 class="uk-panel-title">@lang('Collections')</h2>
 
