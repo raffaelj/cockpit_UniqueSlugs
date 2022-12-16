@@ -45,6 +45,14 @@ class Admin extends \Cockpit\AuthController {
 
     }
 
+    /**
+     * Create slugs in existing entries, that were created before
+     * installing/configuring the UniqueSlugs addon.
+     *
+     * TODO: check for missing localized slugs, where the slug with default language exists
+     *
+     * @return array _id and main slug of updated entries, grouped by collection
+     */
     public function updateEntriesWithoutSlug() {
 
         $config = $this->app->module('uniqueslugs')->config();

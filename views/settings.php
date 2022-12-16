@@ -94,6 +94,16 @@
 
         </div>
 
+        <div class="uk-panel uk-panel-box uk-panel-box-trans uk-panel-card uk-panel-header uk-margin">
+
+            <h2 class="uk-panel-title">@lang('Other')</h2>
+
+            <p>@lang('To create missing slugs for already existing entries, click the button below.')</p>
+
+            <button type="button" class="uk-button uk-button-primary" onclick="{ updateEntriesWithoutSlug }">@lang('Initialize slugs')</button>
+
+        </div>
+
         <cp-actionbar>
             <div class="uk-container uk-container-center">
                 <button class="uk-button uk-button-large uk-button-primary">@lang('Save')</button>
@@ -139,10 +149,30 @@
 
             App.request('/uniqueslugs/saveConfig', {config:this.config}).then(function(data){
 
-               if (data) {
-                   App.ui.notify("Saving successful", "success");
+                if (data) {
+                    App.ui.notify("Saving successful", "success");
                 } else {
                     App.ui.notify("Saving failed.", "danger");
+                }
+
+            });
+
+        }
+
+        updateEntriesWithoutSlug() {
+
+            App.request('/uniqueslugs/updateEntriesWithoutSlug').then(function(data){
+
+                if (data) {
+                    if (Array.isArray(data) && !data.length) {
+                        App.ui.notify("Nothing updated", "success");
+                    }
+                    else {
+                        Object.keys(data).forEach(function(collection) {
+                            var message = "Updated " + data[collection].length + " entries in " + collection;
+                            App.ui.notify(message, "success");
+                        }); 
+                    }
                 }
 
             });
