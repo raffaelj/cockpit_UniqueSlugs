@@ -68,7 +68,6 @@ return [
         'localize' => [
             'pages'     => 'title',
             'products'  => 'name',
-            ],
         ],
     ],
 
